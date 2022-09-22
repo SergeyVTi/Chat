@@ -8,12 +8,15 @@
 #include <unordered_map>
 #include <vector>
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 
 using namespace std;
+namespace fs = std::filesystem;
 
 class Chat {
 	public:
-		Chat();
+		Chat(const string& users_file, const string& messages_file);
 		~Chat() = default;
 
 		bool displayMenu();
@@ -28,8 +31,10 @@ class Chat {
 		template <typename T, typename... Args>
 		void insertMessages(T message, Args&&... users);
 
-	protected:
+		void readUsersFromFile(const string& file);
+		void readMessagesFromFile(const string& file);
 
+	protected:
 		bool displayChat(const pair<string,AuthData>& user);
 		void displayLoginMenu();
 		void displaySignupMenu();
@@ -37,11 +42,17 @@ class Chat {
 		void sentMessageToUser(const pair<string,AuthData>&  from);
 		void displayUsers();
 		void displayMessages(const pair<string,AuthData>& to);
-		string getString(const string& str);
+		void displayMessages();
+		string getString(const string& str);		
+		void writeUserInFile(const string& login, const string& password);
+		void writeMessageInFile(const Message& message);
+		void show_perms(fs::perms p);
 
-
-		unordered_map<string,AuthData> users_; //
+	protected:
+		unordered_map<string,AuthData> users_; 
 		vector<Message> messages_;
+		const string users_file_;
+		const string messages_file_;		
 };
 
 template <typename T>

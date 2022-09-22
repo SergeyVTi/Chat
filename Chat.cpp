@@ -4,16 +4,137 @@
 #include <iostream>
 #include <algorithm>
 
-
 constexpr size_t SHA1HASHLENGTHBYTES = 20;
 
-Chat::Chat() {
-	users_.insert({ "All",AuthData("AllPassword",strlen("AllPassword")) });
+Chat::Chat(const string& users_file, const string& messages_file) : 
+	users_file_(users_file), messages_file_(messages_file) {
+	
+}
+
+void Chat::show_perms(filesystem::perms p)
+{
+	std::cout << ((p & fs::perms::owner_read) != fs::perms::none ? "r" : "-")
+		<< ((p & fs::perms::owner_write) != fs::perms::none ? "w" : "-")
+		<< ((p & fs::perms::owner_exec) != fs::perms::none ? "x" : "-")
+		<< ((p & fs::perms::group_read) != fs::perms::none ? "r" : "-")
+		<< ((p & fs::perms::group_write) != fs::perms::none ? "w" : "-")
+		<< ((p & fs::perms::group_exec) != fs::perms::none ? "x" : "-")
+		<< ((p & fs::perms::others_read) != fs::perms::none ? "r" : "-")
+		<< ((p & fs::perms::others_write) != fs::perms::none ? "w" : "-")
+		<< ((p & fs::perms::others_exec) != fs::perms::none ? "x" : "-")
+		<< '\n';
+}
+
+void Chat::readMessagesFromFile(const string& file) {
+	fstream messages_file_stream = fstream(messages_file_, ios::in | ios::out);
+	if (!messages_file_stream) {
+		messages_file_stream = fstream(messages_file_, ios::in | ios::out | ios::trunc);
+		fs::permissions(messages_file_,fs::perms::all,fs::perm_options::remove);
+		fs::permissions(messages_file_,
+			fs::perms::owner_read | fs::perms::owner_write,
+			fs::perm_options::replace);
+		cout << "Created file <" << messages_file_ << "> with permissions: ";
+		show_perms(fs::status(messages_file_).permissions());
+	}
+	else {
+		fs::permissions(messages_file_, fs::perms::all, fs::perm_options::remove);
+		fs::permissions(messages_file_,
+			fs::perms::owner_read | fs::perms::owner_write,
+			fs::perm_options::replace);
+		cout << "Opened file <" << messages_file_ << "> with permissions: ";
+		show_perms(fs::status(messages_file_).permissions());
+	}	
+
+	if (messages_file_stream) {
+		string from, to, text;
+
+		while (!messages_file_stream.eof()) {
+
+			messages_file_stream >> from >> to;
+
+			getline(messages_file_stream, text, '\n');
+
+			messages_.emplace_back(Message(from, to, text));
+
+			if (messages_file_stream.eof())
+				break;
+		}
+	}
+	messages_file_stream.close();
+}
+
+
+
+void Chat::readUsersFromFile(const string& file) {	
+	fstream user_file_stream = fstream(users_file_, ios::in | ios::out);
+	if (!user_file_stream) {
+		user_file_stream = fstream(users_file_, ios::in | ios::out | ios::trunc);
+		fs::permissions(messages_file_, fs::perms::all, fs::perm_options::remove);
+		fs::permissions(users_file_,
+			fs::perms::owner_read | fs::perms::owner_write,
+			fs::perm_options::replace);
+		cout << "Created file <" << users_file_ << "> with permissions: ";
+		show_perms(fs::status(users_file_).permissions());
+	}
+	else {
+		fs::permissions(messages_file_, fs::perms::all, fs::perm_options::remove);
+		fs::permissions(users_file_,
+			fs::perms::owner_read | fs::perms::owner_write,
+			fs::perm_options::replace);
+		cout << "Opened file <" << users_file_ << "> with permissions: ";
+		show_perms(fs::status(users_file_).permissions());
+	}
+
+
+	if (user_file_stream) {
+		string login, password;		
+
+		while (!user_file_stream.eof()) {
+			
+			user_file_stream >> login >> password;
+
+			insertUsers(pair<string, AuthData>(login, AuthData(password.c_str(), password.length())));
+
+			if (user_file_stream.eof())
+				break;
+		}
+	}
+	user_file_stream.close();
+}
+
+void Chat::writeMessageInFile(const Message& message) {
+	fstream messages_file_stream = fstream(messages_file_, ios::in | ios::out | ios::ate);
+	if (!messages_file_stream) {
+		messages_file_stream = fstream(messages_file_, ios::in | ios::out | ios::trunc);
+	}
+
+	if (messages_file_stream) {
+		messages_file_stream << endl 
+			<< message.getFrom() << " " 
+			<< message.getTo() << " "
+			<< message.getText();
+	}
+	messages_file_stream.close();
+}
+
+void Chat::writeUserInFile(const string& login, const string& password) {
+	fstream user_file_stream = fstream(users_file_, ios::in | ios::out | ios::ate);
+	if (!user_file_stream) {
+		user_file_stream = fstream(users_file_, ios::in | ios::out | ios::trunc);
+	}
+
+	if (user_file_stream) {
+		user_file_stream << endl << login << " " << password;	
+	}
+	user_file_stream.close();
 }
 
 bool Chat::displayMenu() {
 
 	try {
+		cout << endl;
+		displayMessages();
+
 		size_t selection{};
 
 		cout << endl
@@ -86,7 +207,9 @@ void Chat::displaySignupMenu() {
 
 	string password = getString("password");
 
-	users_.insert({ login,AuthData(password.c_str(),password.length()) });
+	writeUserInFile(login, password);
+
+	insertUsers(pair<string, AuthData>(login, AuthData(password.c_str(), password.length())));
 
 	user = users_.find(login);
 
@@ -102,9 +225,9 @@ bool Chat::displayChat(const pair<string, AuthData>& user) {
 	try {
 		size_t selection;
 		cout << endl
-			<< "---------------------------------------------------" << endl
+			<< "------------------------------------------------------" << endl
 			<< "1) send Message To All 2) send Message To User 3) Exit" << endl
-			<< "---------------------------------------------------" << endl
+			<< "------------------------------------------------------" << endl
 			<< "---> ";
 		cin >> selection;
 
@@ -165,6 +288,16 @@ void Chat::displayMessages(const pair<string, AuthData>& to) {
 	}
 }
 
+void Chat::displayMessages() {
+	for (auto& mes : messages_) {
+		if (mes.getTo() == "All") {
+			cout << mes.getFrom() << "(to "
+				<< mes.getTo() << "): " << mes.getText()
+				<< endl;
+		}
+	}
+}
+
 void Chat::sentMessageToAll(const pair<string, AuthData>& from) {
 	string message;
 	cout << "---> ";
@@ -172,6 +305,7 @@ void Chat::sentMessageToAll(const pair<string, AuthData>& from) {
 	getline(cin, message);
 
 	messages_.emplace_back(Message(from.first, "All", message));
+	writeMessageInFile(Message(from.first, "All", message));
 }
 
 string Chat::getString(const string& str) {
@@ -198,6 +332,7 @@ void Chat::sentMessageToUser(const pair<string, AuthData>& from) {
 	getline(cin, message);
 
 	messages_.emplace_back(Message(from.first, user->first, message));
+	writeMessageInFile(Message(from.first, user->first, message));
 
 	return;
 
