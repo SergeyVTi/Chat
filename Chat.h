@@ -10,6 +10,7 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <cstring>
 
 using namespace std;
 namespace fs = std::filesystem;

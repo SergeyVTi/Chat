@@ -69,20 +69,23 @@ void Chat::readUsersFromFile(const string& file) {
 	fstream user_file_stream = fstream(users_file_, ios::in | ios::out);
 	if (!user_file_stream) {
 		user_file_stream = fstream(users_file_, ios::in | ios::out | ios::trunc);
-		fs::permissions(messages_file_, fs::perms::all, fs::perm_options::remove);
+		fs::permissions(users_file_, fs::perms::all, fs::perm_options::remove);
 		fs::permissions(users_file_,
 			fs::perms::owner_read | fs::perms::owner_write,
 			fs::perm_options::replace);
 		cout << "Created file <" << users_file_ << "> with permissions: ";
 		show_perms(fs::status(users_file_).permissions());
+		
+		writeUserInFile("All","AllPassword");
 	}
 	else {
-		fs::permissions(messages_file_, fs::perms::all, fs::perm_options::remove);
+		fs::permissions(users_file_, fs::perms::all, fs::perm_options::remove);
 		fs::permissions(users_file_,
 			fs::perms::owner_read | fs::perms::owner_write,
 			fs::perm_options::replace);
 		cout << "Opened file <" << users_file_ << "> with permissions: ";
 		show_perms(fs::status(users_file_).permissions());
+
 	}
 
 

@@ -1,5 +1,6 @@
 #include "AuthData.h"
 #include <iostream>
+#include <cstring>
 
 constexpr uint one_block_size_bytes = 64; 
 constexpr uint one_block_size_uints = 16; 
