@@ -37,6 +37,7 @@
 *.user
 *.vs
 x64/
+.vscode/
 IsKPeriodicVS/
 
 *.win

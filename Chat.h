@@ -32,8 +32,8 @@ class Chat {
 		template <typename T, typename... Args>
 		void insertMessages(T message, Args&&... users);
 
-		void readUsersFromFile(const string& file);
-		void readMessagesFromFile(const string& file);
+		void readUsersFromFile();
+		void readMessagesFromFile();
 
 	protected:
 		bool displayChat(const pair<string,AuthData>& user);

@@ -25,7 +25,7 @@ void Chat::show_perms(filesystem::perms p)
 		<< '\n';
 }
 
-void Chat::readMessagesFromFile(const string& file) {
+void Chat::readMessagesFromFile() {
 	fstream messages_file_stream = fstream(messages_file_, ios::in | ios::out);
 	if (!messages_file_stream) {
 		messages_file_stream = fstream(messages_file_, ios::in | ios::out | ios::trunc);
@@ -65,7 +65,7 @@ void Chat::readMessagesFromFile(const string& file) {
 
 
 
-void Chat::readUsersFromFile(const string& file) {	
+void Chat::readUsersFromFile() {	
 	fstream user_file_stream = fstream(users_file_, ios::in | ios::out);
 	if (!user_file_stream) {
 		user_file_stream = fstream(users_file_, ios::in | ios::out | ios::trunc);
