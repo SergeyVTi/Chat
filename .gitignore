@@ -27,9 +27,8 @@
 *.lib
 
 # Executables
-*.exe
-*.out
 *.app
+*.exe
 
 *.sln
 *.vcxproj
