@@ -12,7 +12,12 @@ class AuthData {
 		explicit AuthData(const char* password, size_t msize_bytes);
 
 		~AuthData() = default;
-
+		void setOnline(bool status){
+			online_=status;
+		}
+		bool getOnline(){
+			return online_;
+		}
 		uint* getPasswordHash() const {
 			return password_sha1_hash_;
 		}
@@ -24,5 +29,6 @@ class AuthData {
 		uint bring_to_human_view(uint val);
 
 		uint* password_sha1_hash_;
+		bool online_ {0};
 };
 

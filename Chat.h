@@ -11,16 +11,16 @@
 #include <fstream>
 #include <filesystem>
 #include <cstring>
+#include <memory>
 
-using namespace std;
 namespace fs = std::filesystem;
 
 class Chat {
 	public:
-		Chat(const string& users_file, const string& messages_file);
-		~Chat() = default;
+		Chat(const std::string& users_file, const std::string& messages_file);
+		virtual ~Chat() = default;
 
-		bool displayMenu();
+		virtual bool displayMenu() = 0;
 
 		template <typename T>
 		void insertUsers(T pair);
@@ -36,24 +36,17 @@ class Chat {
 		void readMessagesFromFile();
 
 	protected:
-		bool displayChat(const pair<string,AuthData>& user);
-		void displayLoginMenu();
-		void displaySignupMenu();
-		void sentMessageToAll(const pair<string,AuthData>& from);
-		void sentMessageToUser(const pair<string,AuthData>&  from);
-		void displayUsers();
-		void displayMessages(const pair<string,AuthData>& to);
-		void displayMessages();
-		string getString(const string& str);		
-		void writeUserInFile(const string& login, const string& password);
+		
+		string getString(const std::string& str);		
+		void writeUserInFile(const std::string& login, const std::string& password);
 		void writeMessageInFile(const Message& message);
 		void show_perms(fs::perms p);
 
 	protected:
-		unordered_map<string,AuthData> users_; 
+		unordered_map<std::string,AuthData> users_; 
 		vector<Message> messages_;
-		const string users_file_;
-		const string messages_file_;		
+		const std::string users_file_;
+		const std::string messages_file_;		
 };
 
 template <typename T>
