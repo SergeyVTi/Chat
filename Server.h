@@ -1,20 +1,19 @@
 #pragma once
 #include "Chat.h"
-#include "Connection.h"
 
 #if defined(__linux__)
 #define LINUX
 #else
-#define LINUX 
+#define LINUX
 #endif
 
 class Server : public Chat {
 	public:
-		Server(const string& users_file, const string& messages_file);
+		Server(const std::string& users_file, const std::string& messages_file);
 		virtual ~Server() = default;
 
-		virtual bool displayMenu() override;
-
+		virtual void displayMenu() override;
+		virtual void startChat() override;
 
 	protected:
 		bool displayChat();
@@ -23,9 +22,9 @@ class Server : public Chat {
 		void displayLoginMenuForClient();
 		void displaySignupMenuForClient();
 		void displayUsersAndMessages();
+		void displayMenuForClient();
+		bool isCorrectPassword(const std::string& password, const std::string& login);
 
 	protected:
-		unique_ptr<Connection> Connection_;
-		string server_name_;
-		string user_name_;
+
 };

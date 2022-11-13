@@ -1,24 +1,50 @@
+CPP = g++
 SRC = main.cpp
 TARGET = chat.out
-LIB = ChatLib
+MYLIB = ChatLib
 PREF = /usr/local/bin
-FLAGS = g++ -std=c++17 -Wall -Wextra -Wpedantic
+OBJ1 = AuthData.o Chat.o Message.o Connection.o Server.o Client.o 
+OBJ2 = Errors.o InOut.o OS_info.o ContainerHandler.o
+LIBS = -static-libgcc  "/lib/libmariadb.dll.a" -g3
+INCS = -I"/usr/include/mysql"
+FLAGS = $(INCS) -g3 -std=c++17 -Wall -Wextra -Wpedantic
 
-chat : $(SRC) lib
-	g++ -std=c++17 -Wall -Wextra -Wpedantic -o $(TARGET) $(SRC) -L. -l$(LIB)
+$(TARGET): $(OBJ1) $(OBJ2) lib clean
+	$(CPP) -o $(TARGET) $(SRC) $(LIBS) -L. -l$(MYLIB)	
+
+AuthData.o: AuthData.cpp
+	$(CPP) -c AuthData.cpp -o AuthData.o $(FLAGS)
 	
-lib :  AuthData.cpp AuthData.h Chat.cpp Chat.h Message.cpp Message.h Connection.cpp Connection.h Server.cpp Server.o Client.cpp Client.o
-	$(FLAGS) -o AuthData.o AuthData.cpp -c
-	$(FLAGS) -o Chat.o Chat.cpp -c
-	$(FLAGS) -o Message.o Message.cpp -c
-	$(FLAGS) -o Connection.o Connection.cpp -c
-	$(FLAGS) -o Server.o Server.cpp -c
-	$(FLAGS) -o Client.o Client.cpp -c
-	ar rc lib$(LIB).a AuthData.o Chat.o Message.o Connection.o Server.o Client.o
-	export LD_LIBRARY_PATH=.
+Message.o: Message.cpp
+	$(CPP) -c Message.cpp -o Message.o $(FLAGS)
 
+Connection.o: Connection.cpp
+	$(CPP) -c Connection.cpp -o Connection.o $(FLAGS)
+	
+Server.o: Server.cpp
+	$(CPP) -c Server.cpp -o Server.o $(FLAGS)
+	
+Client.o: Client.cpp
+	$(CPP) -c Client.cpp -o Client.o $(FLAGS)	
+	
+Errors.o: Errors.h
+	$(CPP) -c Errors.h -o Errors.o $(FLAGS)
+	
+InOut.o: InOut.h
+	$(CPP) -c InOut.h -o InOut.o $(FLAGS)
+	
+OS_info.o: OS_info.h
+	$(CPP) -c OS_info.h -o OS_info.o $(FLAGS)
+	
+ContainerHandler.o: ContainerHandler.cpp
+	$(CPP) -c ContainerHandler.cpp -o ContainerHandler.o  $(FLAGS)
+	
+lib : $(OBJ1) $(OBJ2) 	
+	ar rc lib$(MYLIB).a $(OBJ1) $(OBJ2) 
+	export LD_LIBRARY_PATH=.	
+				
 clean : 
-	rm -rf *.o *.a
+	rm -rf *.o 
 
 install :
 	sudo install -v $(TARGET) $(PREF)

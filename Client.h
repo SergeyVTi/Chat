@@ -5,20 +5,18 @@
 #if defined(__linux__)
 #define LINUX
 #else
-#define LINUX 
+#define LINUX
 #endif
 
 class Client : public Chat {
 	public:
-		Client(const string& users_file, const string& messages_file,
-		       const string& ip_file);
+		Client(const std::string& users_file, const std::string& messages_file,
+		       const std::string& ip_file);
 		virtual ~Client() = default;
 
-		virtual bool displayMenu() override;
+		virtual void displayMenu() override;
+		virtual void startChat() override;
 
 	protected:
-
-	protected:
-		unique_ptr<Connection> Connection_;
 
 };

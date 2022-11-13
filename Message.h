@@ -2,20 +2,18 @@
 
 #include <string>
 
-using namespace std;
-
 class Message {
 	public:
-		explicit Message(const string& from, const string& to 
-		              , const string& text = "");
+		explicit Message(const std::string& from, const std::string& to 
+		              , const std::string& text = "");
 		~Message() = default;
-		const string& getFrom() const {return from_;}
-		const string& getTo() const {return to_;}
-		const string& getText() const {return text_;}
+		const std::string& getFrom() const {return from_;}
+		const std::string& getTo() const {return to_;}
+		const std::string& getText() const {return text_;}
 
 
 	protected:
-		string from_; 
-		string to_;
-		string text_;
+		std::string from_; 
+		std::string to_;
+		std::string text_;
 };

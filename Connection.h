@@ -46,10 +46,10 @@ class Connection {
 
 #if defined LINUX
 
-class ServerLin64TCPIP : public Connection {
+class ServerLinuxTCP : public Connection {
 	public:
-		ServerLin64TCPIP() = default;
-		virtual ~ServerLin64TCPIP();
+		ServerLinuxTCP() = default;
+		virtual ~ServerLinuxTCP();
 
 	protected:
 		virtual int makeConnection() override;
@@ -60,14 +60,14 @@ class ServerLin64TCPIP : public Connection {
 		struct sockaddr_in serveraddress, client;
 		socklen_t length;
 		int socket_file_descriptor, connection, bind_status,
-		    connection_status;
+		    status;
 		char message[DEFAULT_BUFLEN];
 };
 
-class ClientLin64TCPIP : public ServerLin64TCPIP {
+class ClientLinuxTCP : public ServerLinuxTCP {
 	public:
-		ClientLin64TCPIP(const std::string& ip_file);
-		virtual ~ClientLin64TCPIP();
+		ClientLinuxTCP(const std::string& ip_file);
+		virtual ~ClientLinuxTCP();
 
 	protected:
 		virtual int makeConnection() override;
@@ -80,10 +80,10 @@ class ClientLin64TCPIP : public ServerLin64TCPIP {
 
 #elif defined(_WIN64)
 
-class ServerWin64TCPIP : public Connection {
+class ServerWinTCP : public Connection {
 	public:
-		ServerWin64TCPIP() = default;
-		virtual ~ServerWin64TCPIP();
+		ServerWinTCP() = default;
+		virtual ~ServerWinTCP();
 
 	protected:
 		virtual int makeConnection() override;
@@ -106,11 +106,11 @@ class ServerWin64TCPIP : public Connection {
 		int recvbuflen = DEFAULT_BUFLEN;
 };
 
-class ClientWin64TCPIP : public ServerWin64TCPIP {
+class ClientWinTCP : public ServerWinTCP {
 	public:
-		ClientWin64TCPIP(const std::string& ip_file) : ip_adr_(ip_file){
+		ClientWinTCP(const std::string& ip_file) : ip_adr_(ip_file){
 		}
-		virtual ~ClientWin64TCPIP();
+		virtual ~ClientWinTCP();
 
 	protected:
 		virtual int makeConnection() override;

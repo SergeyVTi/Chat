@@ -3,8 +3,6 @@
 #include <string>
 #include <memory>
 
-using namespace std;
-
 typedef unsigned int uint;
 
 class AuthData {

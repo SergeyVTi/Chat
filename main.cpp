@@ -2,82 +2,79 @@
 #include "Chat.h"
 #include "Client.h"
 #include "Server.h"
+#include "InOut.h"
+#include "OS_info.h"
 
-#if defined(_WIN64)
-#define PLATFORM_NAME "Windows 64-bit" // Windows 64-bit
-#elif defined(__linux__) // Linux
-#define PLATFORM_NAME "Linux"
-#define LINUX
-#include <sys/utsname.h>
-#else
-#define LINUX
-#define PLATFORM_NAME "OS not detected"
-#endif
+using namespace std;
 
-size_t displayMenu();
+void displayOSversion();
+unique_ptr<Chat> selectChatMode();
 
-typedef std::pair<string, AuthData> user;
+const string users_file = "users.txt";
+const string messages_file = "messages.txt";
+string ip_adr = "127.0.0.1";
 
 int main() {
 	setlocale(LC_ALL, "");
+	OS os;
+	try {
+		os.displayVersion();
 
-#if defined (__linux__)
-	struct utsname utsname;
-	uname(&utsname);
+		unique_ptr<Chat> chat = selectChatMode();
 
-	cout << "OS name: " << utsname.sysname << " " << utsname.machine <<
-	     endl;
-	cout << "OS version: " << utsname.version << endl;
-	cout << "OS version: "<< PLATFORM_NAME << endl;
-#else
-	cout << "OS version: "<< PLATFORM_NAME << endl;
-#endif
+		chat->readUsersFromFile();
 
-	const string users_file{"users.txt"};
-	const string messages_file{"messages.txt"};
-	string ip_adr{""};//
+		chat->readMessagesFromFile();
 
-	size_t selection = displayMenu();
-	unique_ptr<Chat> chat;
+		chat->makeConnection();
 
-	if (selection==1)
-		chat = make_unique<Server>(users_file, messages_file);
-	else if (selection==2) {
-		if (ip_adr.size()==0) {
-			cout << "Enter server ip adress:" << endl
-			     << "--->";
-			cin >> ip_adr;
-		}
-		chat = make_unique<Client>(users_file, messages_file, ip_adr);
+		chat->displayMenu();
+
+		chat->startChat();
+
+	} catch (const Exit& e) {
+		cout << e.what() << endl;
+	} catch (const exception& e) {
+		cout << e.what() << endl;
 	}
-
-
-	chat->insertUsers(user("Vasya", AuthData("VasyaPassword",
-	                       strlen("VasyaPassword"))),
-	                  user("Masha", AuthData("MashaPassword", strlen("MashaPassword"))));
-
-	chat->insertMessages(Message("Sergey", "Vasya", "Hi Vasya"),
-	                     Message("Vasya", "All", "Hello world"),
-	                     Message("Vasya", "Masha", "Hi"),
-	                     Message("Masha", "Vasya", "Hello"));
-
-	chat->readUsersFromFile();
-	chat->readMessagesFromFile();
-
-	while (chat->displayMenu()) {
-	}
-
 	return 0;
 }
 
-size_t displayMenu() {
-	size_t selection{};
 
-	cout << endl
-	     << "Select mode:" << endl
-	     << "1) Server 2) Client " << endl
-	     << "---------------------------------" << endl
-	     << "---> ";
-	cin >> selection;
-	return selection;
+unique_ptr<Chat> selectChatMode() {
+	Input input;
+	Output output;
+	size_t selection {};
+
+	while(true) {
+		try {
+			cout << output.getSelectModeMenu();
+
+			selection = input.getInputSelection();
+
+			switch (selection) {
+				case 1:
+					return make_unique<Server>(users_file, messages_file);
+
+				case 2:
+					if (ip_adr.size() == 0) {
+						cout << "Enter server ip adress:" << endl
+						     << "--->";
+						cin >> ip_adr;
+					}
+
+					return make_unique<Client>(users_file, messages_file, ip_adr);
+
+				case 3:
+					throw Exit();
+
+				default:
+					throw Error("ERROR: input error");				
+			}
+		} catch (const Error& e) {
+			cout << e.what() << endl;
+		}
+	}
+	
+	return nullptr;
 }

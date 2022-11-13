@@ -6,11 +6,11 @@ using namespace std;
 
 
 #if defined LINUX
-ServerLin64TCPIP::~ServerLin64TCPIP() {
+ServerLinuxTCP::~ServerLinuxTCP() {
 	close(socket_file_descriptor);
 }
 
-int ServerLin64TCPIP::makeConnection() {
+int ServerLinuxTCP::makeConnection() {
 	// Создадим сокет
 	socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 	if(socket_file_descriptor == -1) {
@@ -32,8 +32,8 @@ int ServerLin64TCPIP::makeConnection() {
 		exit(1);
 	}
 	// Поставим сервер на прием данных
-	connection_status = listen(socket_file_descriptor, 5);
-	if(connection_status == -1) {
+	status = listen(socket_file_descriptor, 5);
+	if(status == -1) {
 		cout << "Socket is unable to listen for new connections.!" << endl;
 		exit(1);
 	}  else  {
@@ -52,13 +52,13 @@ int ServerLin64TCPIP::makeConnection() {
 	return 0;
 }
 
-int ServerLin64TCPIP::sendMessage(const string& mes) {
+int ServerLinuxTCP::sendMessage(const string& mes) {
 	write(connection, mes.c_str(), mes.length());
 
 	return 0;
 }
 
-string ServerLin64TCPIP::reciveMessage() {
+string ServerLinuxTCP::reciveMessage() {
 	memset(message,0,sizeof(message));
 	read(connection, message, sizeof(message));
 
@@ -70,16 +70,16 @@ string ServerLin64TCPIP::reciveMessage() {
 
 /////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////
-ClientLin64TCPIP::ClientLin64TCPIP(const string& ip_file) : ip_adr_
+ClientLinuxTCP::ClientLinuxTCP(const string& ip_file) : ip_adr_
 	(ip_file) {
 
 }
 
-ClientLin64TCPIP::~ClientLin64TCPIP() {
+ClientLinuxTCP::~ClientLinuxTCP() {
 	close(socket_file_descriptor);
 }
 
-int ClientLin64TCPIP::makeConnection() {
+int ClientLinuxTCP::makeConnection() {
 // Создадим сокет
 	socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 	if(socket_file_descriptor == -1) {
@@ -105,13 +105,13 @@ int ClientLin64TCPIP::makeConnection() {
 	return 0;
 }
 
-int ClientLin64TCPIP::sendMessage(const string& mes) {
+int ClientLinuxTCP::sendMessage(const string& mes) {
 	write(socket_file_descriptor, mes.c_str(), mes.length());
 
 	return 0;
 }
 
-string ClientLin64TCPIP::reciveMessage() {
+string ClientLinuxTCP::reciveMessage() {
 	memset(message,0,sizeof(message));
 	read(socket_file_descriptor, message, sizeof(message));
 	string mes;
@@ -123,12 +123,12 @@ string ClientLin64TCPIP::reciveMessage() {
 
 #elif defined(_WIN64)
 
-ServerWin64TCPIP::~ServerWin64TCPIP() {
+ServerWinTCP::~ServerWinTCP() {
 	closesocket(ClientSocket);
 	WSACleanup();
 }
 
-int ServerWin64TCPIP::makeConnection() {
+int ServerWinTCP::makeConnection() {
 	iSendResult = 0;
 	memset(recvbuf, 0, sizeof(recvbuf));
 
@@ -203,7 +203,7 @@ int ServerWin64TCPIP::makeConnection() {
 	return 0;
 }
 
-int ServerWin64TCPIP::sendMessage(const string& message) {
+int ServerWinTCP::sendMessage(const string& message) {
 
 	iSendResult = send( ClientSocket, message.c_str(), message.length(), 0);
 
@@ -216,7 +216,7 @@ int ServerWin64TCPIP::sendMessage(const string& message) {
 	return 0;
 }
 
-string ServerWin64TCPIP::reciveMessage() {
+string ServerWinTCP::reciveMessage() {
 	string message;
 	memset(recvbuf,0,sizeof(recvbuf));
 
@@ -233,12 +233,12 @@ string ServerWin64TCPIP::reciveMessage() {
 	return message;
 }
 
-ClientWin64TCPIP::~ClientWin64TCPIP() {
+ClientWinTCP::~ClientWinTCP() {
 	closesocket(ConnectSocket);
 	WSACleanup();
 }
 
-int ClientWin64TCPIP::makeConnection() {
+int ClientWinTCP::makeConnection() {
 
 	const char *sendbuf = "this is a test";
 
@@ -301,7 +301,7 @@ int ClientWin64TCPIP::makeConnection() {
 	return 0;
 }
 
-int ClientWin64TCPIP::sendMessage(const std::string& message) {
+int ClientWinTCP::sendMessage(const std::string& message) {
 
 	iResult = send( ConnectSocket, message.c_str(), message.length(), 0 );
 	if (iResult == SOCKET_ERROR) {
@@ -314,7 +314,7 @@ int ClientWin64TCPIP::sendMessage(const std::string& message) {
 	return 0;
 }
 
-string ClientWin64TCPIP::reciveMessage() {
+string ClientWinTCP::reciveMessage() {
 	memset(recvbuf,0,sizeof(recvbuf));
 
 	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);	
