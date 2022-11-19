@@ -6,11 +6,6 @@
 using namespace std;
 constexpr size_t SHA1HASHLENGTHBYTES = 20;
 
-Chat::Chat(const string& users_file, const string& messages_file) {
-	containerHandler_ = make_unique<ContainerHandler>(users_file,
-	                    messages_file);
-}
-
 void Chat::makeConnection() {
 	if (connection_->makeConnection() == 1)
 		throw Error("ERROR: connection fail");
@@ -22,14 +17,6 @@ string Chat::reciveMessage() {
 
 void Chat::sendMessage(const string& message) {
 	connection_->sendMessage(message);
-}
-
-void Chat::readUsersFromFile() {
-	containerHandler_->readUsersFromFile();
-}
-
-void Chat::readMessagesFromFile() {
-	containerHandler_->readMessagesFromFile();
 }
 
 void Chat::writeUserInFile(const std::string& login,
@@ -71,19 +58,6 @@ void Chat::addUsers(pair<string, AuthData> pair) {
 }
 
 void Chat::addMessage(const string& from, const string& to
-                              , const string& text) {
+                      , const string& text) {
 	containerHandler_->addMessage(from, to, text);
 }
-
-
-string Chat::getString(const string& str) {
-	string login;
-	cout << endl
-	     << "Enter " << str << endl
-	     << "---> ";
-	cin >> login;
-
-	return login;
-}
-//
-

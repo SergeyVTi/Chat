@@ -43,7 +43,7 @@ int ServerLinuxTCP::makeConnection() {
 	connection = accept(socket_file_descriptor,(struct sockaddr*)&client,
 	                    &length);
 	if(connection == -1)  {
-		cout << "Server is unable to accept the data from client.!" << endl;
+		cout << "Server is unable to accept the StartData from client.!" << endl;
 		exit(1);
 	}
 
@@ -133,7 +133,7 @@ int ServerWinTCP::makeConnection() {
 	memset(recvbuf, 0, sizeof(recvbuf));
 
 	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
+	iResult = WSAStartup(MAKEWORD(2, 2), &wsaStartData);
 
 	if (iResult != 0) {
 		printf("WSAStartup failed with error: %d\n", iResult);
@@ -248,7 +248,7 @@ int ClientWinTCP::makeConnection() {
 	}
 
 	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
+	iResult = WSAStartup(MAKEWORD(2,2), &wsaStartData);
 	if (iResult != 0) {
 		printf("WSAStartup failed with error: %d\n", iResult);
 		return 1;

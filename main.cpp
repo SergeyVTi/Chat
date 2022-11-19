@@ -7,24 +7,19 @@
 
 using namespace std;
 
-void displayOSversion();
 unique_ptr<Chat> selectChatMode();
-
-const string users_file = "users.txt";
-const string messages_file = "messages.txt";
-string ip_adr = "127.0.0.1";
+StartData startData;
 
 int main() {
 	setlocale(LC_ALL, "");
 	OS os;
+
 	try {
 		os.displayVersion();
 
 		unique_ptr<Chat> chat = selectChatMode();
 
-		chat->readUsersFromFile();
-
-		chat->readMessagesFromFile();
+		chat->setDataBase();
 
 		chat->makeConnection();
 
@@ -54,27 +49,24 @@ unique_ptr<Chat> selectChatMode() {
 
 			switch (selection) {
 				case 1:
-					return make_unique<Server>(users_file, messages_file);
+					return make_unique<Server>(startData);
 
 				case 2:
-					if (ip_adr.size() == 0) {
-						cout << "Enter server ip adress:" << endl
-						     << "--->";
-						cin >> ip_adr;
-					}
+//					if (ip_adr.size() == 0)
+//						ip_adr = input.getInputString("server ip adress");
 
-					return make_unique<Client>(users_file, messages_file, ip_adr);
+					return make_unique<Client>(startData);
 
 				case 3:
 					throw Exit();
 
 				default:
-					throw Error("ERROR: input error");				
+					throw Error("ERROR: input error");
 			}
 		} catch (const Error& e) {
 			cout << e.what() << endl;
 		}
 	}
-	
+
 	return nullptr;
 }

@@ -1,0 +1,12 @@
+CREATE TABLE positions (
+  id SERIAL, 
+  order_id integer NOT NULL references orders(id), 
+  product_id integer NOT NULL references products(id), 
+  amount integer NOT NULL, 
+  PRIMARY KEY (id)
+);
+ALTER TABLE positions CONVERT TO CHARACTER SET utf8;
+SHOW CREATE TABLE positions;
+
+
+

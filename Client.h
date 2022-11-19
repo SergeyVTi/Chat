@@ -10,12 +10,13 @@
 
 class Client : public Chat {
 	public:
-		Client(const std::string& users_file, const std::string& messages_file,
-		       const std::string& ip_file);
+		Client(const StartData& data) : Chat(data) {}
 		virtual ~Client() = default;
 
 		virtual void displayMenu() override;
 		virtual void startChat() override;
+		virtual void setDataBase() override;
+		virtual	void makeConnection() override;
 
 	protected:
 

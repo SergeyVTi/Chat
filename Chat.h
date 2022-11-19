@@ -1,37 +1,40 @@
 #pragma once
 
-//#include "AuthData.h"//
-//#include "Message.h"//
 #include "Connection.h"
-#include "FileIO.h"
+#include "DataBase.h"
+#include "InOut.h"
 
 #include <string>
-//#include <exception>
 #include <unordered_map>
-//#include <vector>//
 #include <iostream>
-//#include <fstream>//
 #include <filesystem>
-//#include <cstring>//
 #include <memory>
 
 namespace fs = std::filesystem;//
 
+struct StartData {
+	const  char* SQL_name = "testdb";
+	const  char* SQL_user = "root";
+	const  char* SQL_password = "root";
+	const  std::string SQL_commands = "createTables.txt";
+
+	const  std::string users_file = "users.txt";
+	const  std::string messages_file = "messages.txt";
+	std::string ip_adr = "127.0.0.1";
+};
+
 class Chat {
 	public:
-		Chat(const std::string& users_file, const std::string& messages_file);
+		Chat(const StartData& data) : startData(data) {
+		}
 		virtual ~Chat() = default;
 
 		virtual void displayMenu() = 0;
-		void makeConnection();
+		virtual void makeConnection() = 0;
 		virtual void startChat() = 0;
-
-		void readUsersFromFile();
-		void readMessagesFromFile();
+		virtual void setDataBase() = 0;
 
 	protected:
-
-		std::string getString(const std::string& str);
 
 		void writeUserInFile(const std::string& login,
 		                     const std::string& password);
@@ -52,7 +55,12 @@ class Chat {
 	protected:
 		bool successfulAccessToAccount_ = 0;
 		std::unique_ptr<Connection> connection_ = nullptr;
-		std::unique_ptr<FileIO> containerHandler_ = nullptr;
+		std::unique_ptr<DataBase> containerHandler_ = nullptr;
+		Input input;
+		Output output;
+		StartData startData;
 };
+
+
 
 

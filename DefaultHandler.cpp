@@ -1,4 +1,4 @@
-#include "FileIO.h"
+#include "SQLdataBase.h"
 
 #include <iostream>
 #include <cstring>
@@ -6,8 +6,12 @@
 namespace fs = std::filesystem;
 using namespace std;
 
+bool DefaultHandler::isConnectedToSQLdataBase(){
+	return false;
+}
+
 unordered_map<std::string, AuthData>::iterator
-ContainerHandler::findUser(const std::string& login) {
+DefaultHandler::findUser(const std::string& login) {
 	auto user = users_.find(login);
 	if (user == users_.end())
 		throw Error("ERROR: Cant find login");
@@ -15,7 +19,7 @@ ContainerHandler::findUser(const std::string& login) {
 	return user;
 }
 
-bool ContainerHandler::isUserExists(const string& login) {
+bool DefaultHandler::isUserExists(const string& login) {
 	auto user = users_.begin();
 	user = users_.find(login);
 
@@ -25,27 +29,27 @@ bool ContainerHandler::isUserExists(const string& login) {
 	return false;
 }
 
-void ContainerHandler::setUserName(const string& login) {
+void DefaultHandler::setUserName(const string& login) {
 	auto user = users_.find(login);
 	user->second.setOnline(1);
 	user_name_ = user->first;
 }
 
-void ContainerHandler::setServerName(const string& login) {
+void DefaultHandler::setServerName(const string& login) {
 	auto user = findUser(login);
 	user->second.setOnline(1);
 	server_name_ = user->first;
 }
 
-std::string ContainerHandler::getServerName() {
+std::string DefaultHandler::getServerName() {
 	return server_name_;
 }
 
-std::string ContainerHandler::getUserName() {
+std::string DefaultHandler::getUserName() {
 	return user_name_;
 }
 
-void ContainerHandler::showPermissions(filesystem::perms p) {
+void DefaultHandler::showPermissions(filesystem::perms p) {
 	std::cout << ((p & fs::perms::owner_read) != fs::perms::none ? "r" :
 	              "-")
 	          << ((p & fs::perms::owner_write) != fs::perms::none ? "w" : "-")
@@ -59,7 +63,7 @@ void ContainerHandler::showPermissions(filesystem::perms p) {
 	          << '\n';
 }
 
-void ContainerHandler::readMessagesFromFile() {
+void DefaultHandler::readMessagesFromDataBase() {
 	fstream messages_file_stream = fstream(messages_file_,
 	                                       ios::in | ios::out);
 	if (!messages_file_stream) {
@@ -100,7 +104,7 @@ void ContainerHandler::readMessagesFromFile() {
 	messages_file_stream.close();
 }
 
-void ContainerHandler::readUsersFromFile() {
+void DefaultHandler::readUsersFromDataBase() {
 	addUsers(pair<string, AuthData>("Vasya", AuthData("VasyaPassword",
 	                                strlen("VasyaPassword"))),
 	         pair<string, AuthData>("Masha", AuthData("MashaPassword",
@@ -151,7 +155,7 @@ void ContainerHandler::readUsersFromFile() {
 	user_file_stream.close();
 }
 
-void ContainerHandler::writeMessageInFile(const Message& message) {
+void DefaultHandler::writeMessageInFile(const Message& message) {
 	fstream messages_file_stream = fstream(messages_file_,
 	                                       ios::in | ios::out | ios::ate);
 	if (!messages_file_stream) {
@@ -168,7 +172,7 @@ void ContainerHandler::writeMessageInFile(const Message& message) {
 	messages_file_stream.close();
 }
 
-void ContainerHandler::writeUserInFile(const string& login,
+void DefaultHandler::writeUserInFile(const string& login,
                                        const string& password) {
 	fstream user_file_stream = fstream(users_file_,
 	                                   ios::in | ios::out | ios::ate);
@@ -183,12 +187,12 @@ void ContainerHandler::writeUserInFile(const string& login,
 	user_file_stream.close();
 }
 
-void ContainerHandler::addMessage(const string& from, const string& to
+void DefaultHandler::addMessage(const string& from, const string& to
                                   , const string& text) {
 	messages_.emplace_back(Message(from, to, text));
 }
 
-string ContainerHandler::displayUsersAndMessages() {
+string DefaultHandler::displayUsersAndMessages() {
 	string message;
 
 	message+="---------------------------------------------------\n";

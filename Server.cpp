@@ -2,6 +2,7 @@
 #include "Server.h"
 #include "InOut.h"
 #include "Errors.h"
+#include "SQLdataBase.h"
 
 #include <iostream>
 #include <algorithm>
@@ -10,20 +11,51 @@ using namespace std;
 
 constexpr size_t SHA1HASHLENGTHBYTES = 20;
 
-Server::Server(const string& users_file,
-               const string& messages_file) : Chat(users_file, messages_file) {
+void Server::makeConnection() {
 #if defined(_WIN64)
 	connection_ = make_unique<ServerWinTCP>();
 #elif defined LINUX
 	connection_ = make_unique<ServerLinuxTCP>();
 #endif
+
+	if (connection_->makeConnection() == 1)
+		throw Error("ERROR: connection fail");
+}
+
+void Server::setDataBase() {
+	containerHandler_ = make_unique<SQLdataBase>(startData);
+
+	if (isConnectedToSQLdataBase()) {
+		//cout << "Using SQL database" << endl;
+
+	} else {
+		containerHandler_ = make_unique<DefaultHandler>
+		                    (startData.users_file,
+		                     startData.messages_file);
+
+		cout << "Using default database" << endl;
+	}
+
+	readUsersFromDataBase();
+	readMessagesFromDataBase();
+}
+
+bool  Server::isConnectedToSQLdataBase() {
+	return containerHandler_->isConnectedToSQLdataBase();
+}
+
+void Server::readUsersFromDataBase() {
+	containerHandler_->readUsersFromDataBase();
+}
+
+void Server::readMessagesFromDataBase() {
+	containerHandler_->readMessagesFromDataBase();
 }
 
 void Server::displayMenu() {
-	Input input;
-	Output output;
+
 	string menu = output.getLoginMenu();
-	size_t selection{};
+	size_t selection {};
 
 	while(true) {
 		try {
@@ -57,11 +89,11 @@ void Server::displayMenu() {
 }
 
 void Server::displayLoginMenu() {
-	string login = getString("login");
+	string login = input.getInputString("login");
 
 	auto user = findUser(login);
 
-	string password = getString("password");
+	string password = input.getInputString("password");
 
 	uint* hash = user->second.sha1(password.c_str(), password.length());
 
@@ -146,12 +178,11 @@ bool Server::isCorrectPassword(const string& password,
 }
 //
 void Server::displaySignupMenu() {
-	string login = getString("login");
+	string login = input.getInputString("login");
 
-	if (isUserExists(login))
-		throw Error("ERROR: login already in use");
+	throw Error("ERROR: login already in use");
 
-	string password = getString("password");
+	string password = input.getInputString("password");
 
 	writeUserInFile(login, password);
 
@@ -171,7 +202,7 @@ void Server::startChat() {
 void Server::displayMenuForClient() {
 	string messageIn;
 	size_t selection;
-	Output output;
+
 	string menu = output.getLoginMenu();
 
 	while (true) {

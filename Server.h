@@ -9,11 +9,13 @@
 
 class Server : public Chat {
 	public:
-		Server(const std::string& users_file, const std::string& messages_file);
+		Server(const StartData& data) : Chat(data) {}
 		virtual ~Server() = default;
 
 		virtual void displayMenu() override;
 		virtual void startChat() override;
+		virtual void setDataBase() override;
+		virtual	void makeConnection() override;
 
 	protected:
 		bool displayChat();
@@ -23,7 +25,12 @@ class Server : public Chat {
 		void displaySignupMenuForClient();
 		void displayUsersAndMessages();
 		void displayMenuForClient();
-		bool isCorrectPassword(const std::string& password, const std::string& login);
+		bool isCorrectPassword(const std::string& password,
+		                       const std::string& login);
+
+		void readUsersFromDataBase();
+		void readMessagesFromDataBase();
+		bool isConnectedToSQLdataBase();
 
 	protected:
 

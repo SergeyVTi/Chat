@@ -30,9 +30,7 @@
 #include <arpa/inet.h>
 #endif
 
-constexpr size_t DEFAULT_BUFLEN = 1024;
-constexpr size_t DEFAULT_PORT1 = 27015;
-constexpr char* DEFAULT_PORT2  = "27015";
+const size_t DEFAULT_BUFLEN = 1024;
 
 class Connection {
 	public:
@@ -42,6 +40,9 @@ class Connection {
 		virtual int sendMessage(const std::string& message) = 0;
 		virtual std::string reciveMessage() = 0;
 	protected:
+
+		const size_t DEFAULT_PORT1 = 27015;
+		const char* DEFAULT_PORT2  = "27015";
 };
 
 #if defined LINUX
@@ -91,7 +92,7 @@ class ServerWinTCP : public Connection {
 		virtual std::string reciveMessage() override;
 
 	protected:
-		WSADATA wsaData;
+		WSAStartData wsaStartData;
 		int iResult;
 
 		SOCKET ListenSocket = INVALID_SOCKET;
@@ -108,7 +109,7 @@ class ServerWinTCP : public Connection {
 
 class ClientWinTCP : public ServerWinTCP {
 	public:
-		ClientWinTCP(const std::string& ip_file) : ip_adr_(ip_file){
+		ClientWinTCP(const std::string& ip_file) : ip_adr_(ip_file) {
 		}
 		virtual ~ClientWinTCP();
 
