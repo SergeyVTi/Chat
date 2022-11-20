@@ -129,7 +129,7 @@ void DefaultHandler::readUsersFromDataBase() {
 		cout << "Created file <" << users_file_ << "> with permissions: ";
 		showPermissions(fs::status(users_file_).permissions());
 
-		writeUserInFile("All","AllPassword");
+		writeUserInDataBase("All","AllPassword");
 	} else {
 		fs::permissions(users_file_, fs::perms::all,
 		                fs::perm_options::remove);
@@ -155,7 +155,7 @@ void DefaultHandler::readUsersFromDataBase() {
 	user_file_stream.close();
 }
 
-void DefaultHandler::writeMessageInFile(const Message& message) {
+void DefaultHandler::writeMessageInDataBase(const Message& message) {
 	fstream messages_file_stream = fstream(messages_file_,
 	                                       ios::in | ios::out | ios::ate);
 	if (!messages_file_stream) {
@@ -172,7 +172,7 @@ void DefaultHandler::writeMessageInFile(const Message& message) {
 	messages_file_stream.close();
 }
 
-void DefaultHandler::writeUserInFile(const string& login,
+void DefaultHandler::writeUserInDataBase(const string& login,
                                        const string& password) {
 	fstream user_file_stream = fstream(users_file_,
 	                                   ios::in | ios::out | ios::ate);

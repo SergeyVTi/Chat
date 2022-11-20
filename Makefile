@@ -8,8 +8,8 @@ OBJ2 = Errors.o InOut.o OS_info.o DefaultHandler.o
 OBJ3 = SQLdataBase.cpp
 LIBS = -static-libgcc  "/lib/libmariadb.dll.a"
 INCS = -I"/usr/include/mysql"
-FLAGS = -std=c++17 -Wall -Wextra -Wpedantic -g3 
-#$(INCS)
+FLAGS = -std=c++17 
+#$(INCS) -Wall -Wextra -Wpedantic -g3 
 $(TARGET): $(OBJ1) $(OBJ2) lib clean
 	$(CPP) -o $(TARGET) $(OBJ3) $(SRC) $(INCS) $(LIBS) -L. -l$(MYLIB)	
 

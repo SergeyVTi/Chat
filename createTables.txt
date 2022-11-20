@@ -1,12 +1,33 @@
-CREATE TABLE positions (
-  id SERIAL, 
-  order_id integer NOT NULL references orders(id), 
-  product_id integer NOT NULL references products(id), 
-  amount integer NOT NULL, 
-  PRIMARY KEY (id)
+
+CREATE TABLE users (
+  id SERIAL PRIMARY KEY, 
+  login VARCHAR(50) UNIQUE NOT NULL
 );
-ALTER TABLE positions CONVERT TO CHARACTER SET utf8;
-SHOW CREATE TABLE positions;
+ALTER TABLE users CONVERT TO CHARACTER SET utf8;
+SHOW CREATE TABLE users;
+
+CREATE TABLE hash (
+  id SERIAL PRIMARY KEY, 
+  user INTEGER NOT NULL UNIQUE REFERENCES users(id), 
+  uint1 BIGINT NOT NULL,
+  uint2 BIGINT NOT NULL,
+  uint3 BIGINT NOT NULL,
+  uint4 BIGINT NOT NULL,
+  uint5 BIGINT NOT NULL
+);
+ALTER TABLE hash CONVERT TO CHARACTER SET utf8;
+SHOW CREATE TABLE hash;
+
+CREATE TABLE messages (
+  id SERIAL PRIMARY KEY, 
+  fromUser INTEGER NOT NULL REFERENCES users(id), 
+  toUser INTEGER NOT NULL REFERENCES users(id), 
+  text VARCHAR(200) NOT NULL
+);
+ALTER TABLE messages CONVERT TO CHARACTER SET utf8;
+SHOW CREATE TABLE messages;
+
+
 
 
 

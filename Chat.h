@@ -3,6 +3,8 @@
 #include "Connection.h"
 #include "DataBase.h"
 #include "InOut.h"
+//#include "OS_info.h"
+//#include "Errors.h"
 
 #include <string>
 #include <unordered_map>
@@ -36,9 +38,9 @@ class Chat {
 
 	protected:
 
-		void writeUserInFile(const std::string& login,
+		void writeUserInDataBase(const std::string& login,
 		                     const std::string& password);
-		void writeMessageInFile(const Message& message);
+		void writeMessageInDataBase(const Message& message);
 		std::unordered_map<std::string, AuthData>::iterator findUser(
 		    const std::string& login);
 		bool isUserExists(const std::string& login);

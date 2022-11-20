@@ -19,13 +19,13 @@ void Chat::sendMessage(const string& message) {
 	connection_->sendMessage(message);
 }
 
-void Chat::writeUserInFile(const std::string& login,
+void Chat::writeUserInDataBase(const std::string& login,
                            const std::string& password) {
-	containerHandler_->writeUserInFile(login, password);
+	containerHandler_->writeUserInDataBase(login, password);
 }
 
-void Chat::writeMessageInFile(const Message& message) {
-	containerHandler_->writeMessageInFile(message);
+void Chat::writeMessageInDataBase(const Message& message) {
+	containerHandler_->writeMessageInDataBase(message);
 }
 
 unordered_map<std::string, AuthData>::iterator Chat::findUser(

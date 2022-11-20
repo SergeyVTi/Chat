@@ -21,8 +21,8 @@ class DataBase {
 		virtual ~DataBase() = default;
 		virtual void readUsersFromDataBase() = 0;
 		virtual void readMessagesFromDataBase() = 0;
-		virtual void writeMessageInFile(const Message& message) = 0;
-		virtual void writeUserInFile(const std::string& login,
+		virtual void writeMessageInDataBase(const Message& message) = 0;
+		virtual void writeUserInDataBase(const std::string& login,
 		                             const std::string& password) = 0;
 		virtual std::unordered_map<std::string, AuthData>::iterator findUser(
 		    const std::string& login) = 0;
@@ -58,8 +58,11 @@ class DataBase {
 
 template <typename T>
 void DataBase::addUsers(T pair) {
-	if (isUserExists(pair.first))
+	if (isUserExists(pair.first)){
+		std::cout << "User " << pair.first << " exists" << std::endl;
 		return;
+	}
+		
 
 	users_.insert(pair);
 
@@ -67,7 +70,7 @@ void DataBase::addUsers(T pair) {
 
 	uint* hash = pair.second.getPasswordHash();
 	for (size_t i = 0; i < 5; ++i)
-		std::cout << std::hex << hash[i] << " ";
+		std::cout << hash[i] << " ";//<< std::hex
 	std::cout << std::endl;
 }
 

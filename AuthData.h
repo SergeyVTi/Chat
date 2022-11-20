@@ -8,6 +8,8 @@ typedef unsigned int uint;
 class AuthData {
 	public:
 		explicit AuthData(const char* password, size_t msize_bytes);
+		explicit AuthData(uint* hash) : password_sha1_hash_(hash) {}
+		AuthData() = default;
 
 		~AuthData() = default;
 		void setOnline(bool status){
@@ -16,6 +18,7 @@ class AuthData {
 		bool getOnline(){
 			return online_;
 		}
+
 		uint* getPasswordHash() const {
 			return password_sha1_hash_;
 		}

@@ -122,7 +122,7 @@ void Server::displaySignupMenuForClient() {
 			sendMessage("Enter password:\n");
 			password = reciveMessage();
 
-			writeUserInFile(login, password);
+			writeUserInDataBase(login, password);
 
 			addUsers(pair<string, AuthData>(login, AuthData(password.c_str(),
 			                                password.length())));
@@ -179,12 +179,12 @@ bool Server::isCorrectPassword(const string& password,
 //
 void Server::displaySignupMenu() {
 	string login = input.getInputString("login");
-
-	throw Error("ERROR: login already in use");
+	if (isUserExists(login))
+		throw Error("ERROR: login already in use");
 
 	string password = input.getInputString("password");
 
-	writeUserInFile(login, password);
+	writeUserInDataBase(login, password);
 
 	addUsers(pair<string, AuthData>(login, AuthData(password.c_str(),
 	                                password.length())));
@@ -246,16 +246,16 @@ bool Server::displayChat() {
 			throw Exit();
 		}
 
-		message = user_name + "(to " +  server_name  + "): "  +  messageIn +
+		message = user_name + "(to " +  server_name  + "):"  +  messageIn +
 		          "\n";
 		cout <<  message;
 
 		addMessage(user_name, server_name, messageIn);
-		writeMessageInFile(Message(user_name, server_name, messageIn));
+		writeMessageInDataBase(Message(user_name, server_name, messageIn));
 
 		messageIn.clear();
 
-		messageOut=server_name+"(to "+user_name+"): ";
+		messageOut=server_name+"(to "+user_name+"):";
 		cout << "--->";
 
 		cin >> messageIn;
@@ -271,7 +271,7 @@ bool Server::displayChat() {
 
 		addMessage(server_name, user_name, messageIn);
 
-		writeMessageInFile(Message(server_name, user_name, messageIn));
+		writeMessageInDataBase(Message(server_name, user_name, messageIn));
 	}
 
 	return true;

@@ -3,6 +3,7 @@
 #include "DataBase.h"
 #include "Chat.h"
 #include <mysql.h>
+//#include <vector>
 
 class SQLdataBase : public DataBase {
 	public:
@@ -10,8 +11,8 @@ class SQLdataBase : public DataBase {
 
 		virtual void readUsersFromDataBase() override;
 		virtual void readMessagesFromDataBase() override;
-		virtual void writeMessageInFile(const Message& message) override;
-		virtual void writeUserInFile(const std::string& login,
+		virtual void writeMessageInDataBase(const Message& message) override;
+		virtual void writeUserInDataBase(const std::string& login,
 		                             const std::string& password) override;
 		virtual std::unordered_map<std::string, AuthData>::iterator findUser(
 		    const std::string& login) override;
@@ -28,6 +29,8 @@ class SQLdataBase : public DataBase {
 	protected:
 		void createTables();
 		void printResult();
+		void addUsersToSQLFromFile();
+		std::vector<std::string> getResultsFromSQL();
 			 
 	protected:
 		MYSQL mysql_;
@@ -47,8 +50,8 @@ class DefaultHandler : public DataBase {
 		void showPermissions(std::filesystem::perms p);
 		virtual void readUsersFromDataBase() override;
 		virtual void readMessagesFromDataBase() override;
-		virtual void writeMessageInFile(const Message& message) override;
-		virtual void writeUserInFile(const std::string& login,
+		virtual void writeMessageInDataBase(const Message& message) override;
+		virtual void writeUserInDataBase(const std::string& login,
 		                             const std::string& password) override;
 		virtual std::unordered_map<std::string, AuthData>::iterator findUser(
 		    const std::string& login) override;
