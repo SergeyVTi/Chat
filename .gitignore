@@ -29,6 +29,7 @@
 # Executables
 *.app
 *.exe
+*.out
 
 *.sln
 *.vcxproj
@@ -37,7 +38,7 @@
 *.vs
 x64/
 .vscode/
-IsKPeriodicVS/
+build/
 
 *.win
 *.dev

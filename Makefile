@@ -16,6 +16,9 @@ $(TARGET): $(OBJ1) $(OBJ2) lib clean
 AuthData.o: AuthData.cpp
 	$(CPP) -c AuthData.cpp -o AuthData.o $(FLAGS)
 	
+Chat.o: Chat.cpp
+	$(CPP) -c Chat.cpp -o Chat.o $(FLAGS)
+	
 Message.o: Message.cpp
 	$(CPP) -c Message.cpp -o Message.o $(FLAGS)
 
