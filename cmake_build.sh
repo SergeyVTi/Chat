@@ -1,0 +1,6 @@
+cmake . 
+make
+./chat.out
+
+
+

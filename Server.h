@@ -1,5 +1,6 @@
 #pragma once
 #include "Chat.h"
+#include "Logger.h"
 
 #if defined(__linux__)
 #define LINUX
@@ -9,7 +10,8 @@
 
 class Server : public Chat {
 	public:
-		Server(const StartData& data) : Chat(data) {}
+		Server() : Chat(),//const StartData& data
+			logger_(std::make_shared<Logger>()) {}
 		virtual ~Server() = default;
 
 		virtual void displayMenu() override;
@@ -33,5 +35,5 @@ class Server : public Chat {
 		bool isConnectedToSQLdataBase();
 
 	protected:
-
+		std::shared_ptr<Logger> logger_ = nullptr;
 };

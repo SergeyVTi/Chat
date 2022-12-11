@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.23.2)
+cmake_minimum_required(VERSION 3.22)
 
 project(Chat)
 
@@ -7,7 +7,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
 set (INCS "/usr/include/mysql")
 #set (LIB "/lib/libmariadb.dll.a")
-find_library(MYSQL_LIBRARY mariadb)
+#find_library(MYSQL_LIBRARY mariadb)
+
+find_library(MYSQL_LIBRARY mysqlclient)
 
 set(SOURCES main.cpp
 	Chat.cpp
@@ -16,10 +18,8 @@ set(SOURCES main.cpp
     Connection.cpp
     Server.cpp
     Client.cpp
-    DefaultHandler.cpp
-    SQLdataBase.cpp) 
-    
-#set(HEADERS Errors.h InOut.h OS_info.h)     
+    SQLdataBase.cpp
+	Logger.cpp)  
 
 #add_library(mylib ${SOURCES})
 include_directories(${INCS})

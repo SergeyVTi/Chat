@@ -3,13 +3,9 @@
 
 #include <iostream>
 #include <algorithm>
+
 using namespace std;
 constexpr size_t SHA1HASHLENGTHBYTES = 20;
-
-void Chat::makeConnection() {
-	if (connection_->makeConnection() == 1)
-		throw Error("ERROR: connection fail");
-}
 
 string Chat::reciveMessage() {
 	return connection_->reciveMessage();
@@ -20,7 +16,7 @@ void Chat::sendMessage(const string& message) {
 }
 
 void Chat::writeUserInDataBase(const std::string& login,
-                           const std::string& password) {
+                               const std::string& password) {
 	containerHandler_->writeUserInDataBase(login, password);
 }
 

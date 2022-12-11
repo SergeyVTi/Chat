@@ -1,8 +1,8 @@
 #include "Connection.h"
+
 #include <iostream>
 
 using namespace std;
-
 
 
 #if defined LINUX
@@ -10,11 +10,15 @@ ServerLinuxTCP::~ServerLinuxTCP() {
 	close(socket_file_descriptor);
 }
 
+void Connection::setLogger(shared_ptr<Logger> logger) {
+	logger_ = logger;
+}
+
 int ServerLinuxTCP::makeConnection() {
 	// Создадим сокет
 	socket_file_descriptor = socket(AF_INET, SOCK_STREAM, 0);
 	if(socket_file_descriptor == -1) {
-		cout << "Socket creation failed.!" << endl;
+		*logger_ << "Socket creation failed" << endl;
 		exit(1);
 	}
 	//
@@ -28,25 +32,27 @@ int ServerLinuxTCP::makeConnection() {
 	                   (struct sockaddr*)&serveraddress,
 	                   sizeof(serveraddress));
 	if(bind_status == -1)  {
-		cout << "Socket binding failed.!" << endl;
+		*logger_ << "Socket binding failed" << endl;
 		exit(1);
 	}
 	// Поставим сервер на прием данных
 	status = listen(socket_file_descriptor, 5);
 	if(status == -1) {
-		cout << "Socket is unable to listen for new connections.!" << endl;
+		*logger_ << "Socket is unable to listen for new connections" << endl;
 		exit(1);
 	}  else  {
-		cout << "Server is listening for new connection: " << endl;
+		*logger_ << "Server is listening for new connection" << endl;
+		cout << "Server is listening for new connection" << endl;
 	}
 	length = sizeof(client);
 	connection = accept(socket_file_descriptor,(struct sockaddr*)&client,
 	                    &length);
 	if(connection == -1)  {
-		cout << "Server is unable to accept the StartData from client.!" << endl;
+		*logger_ << "Server is unable to accept the StartData from client" << endl;
 		exit(1);
 	}
 
+	*logger_ << "Client connected" << endl;
 	cout << "Client connected!" << endl;
 	// Communication Establishment
 	return 0;
@@ -205,7 +211,8 @@ int ServerWinTCP::makeConnection() {
 
 int ServerWinTCP::sendMessage(const string& message) {
 
-	iSendResult = send( ClientSocket, message.c_str(), message.length(), 0);
+	iSendResult = send( ClientSocket, message.c_str(), message.length(),
+	                    0);
 
 	if (iSendResult == SOCKET_ERROR) {
 		printf("send failed with error: %d\n", WSAGetLastError());
@@ -260,7 +267,8 @@ int ClientWinTCP::makeConnection() {
 	hints.ai_protocol = IPPROTO_TCP;
 
 	// Resolve the server address and port
-	iResult = getaddrinfo(ip_adr_.c_str(), DEFAULT_PORT2, &hints, &result);
+	iResult = getaddrinfo(ip_adr_.c_str(), DEFAULT_PORT2, &hints,
+	                      &result);
 	if ( iResult != 0 ) {
 		printf("getaddrinfo failed with error: %d\n", iResult);
 		WSACleanup();
@@ -317,8 +325,8 @@ int ClientWinTCP::sendMessage(const std::string& message) {
 string ClientWinTCP::reciveMessage() {
 	memset(recvbuf,0,sizeof(recvbuf));
 
-	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);	
-	
+	iResult = recv(ConnectSocket, recvbuf, recvbuflen, 0);
+
 	string message;
 	message = recvbuf;
 

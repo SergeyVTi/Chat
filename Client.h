@@ -10,7 +10,7 @@
 
 class Client : public Chat {
 	public:
-		Client(const StartData& data) : Chat(data) {}
+		Client() : Chat() {}//const StartData& data
 		virtual ~Client() = default;
 
 		virtual void displayMenu() override;

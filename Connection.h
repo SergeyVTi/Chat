@@ -1,5 +1,7 @@
 #pragma once
 #include <string>
+#include <memory>
+#include "Logger.h"
 
 #if defined(_WIN64)
 #undef UNICODE
@@ -39,10 +41,15 @@ class Connection {
 		virtual int makeConnection() = 0;
 		virtual int sendMessage(const std::string& message) = 0;
 		virtual std::string reciveMessage() = 0;
+
+		void setLogger(std::shared_ptr<Logger> logger);
+
 	protected:
 
+	protected:
 		const size_t DEFAULT_PORT1 = 27015;
 		const char* DEFAULT_PORT2  = "27015";
+		std::shared_ptr<Logger> logger_ = nullptr;
 };
 
 #if defined LINUX

@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 
@@ -13,27 +14,33 @@ constexpr size_t SHA1HASHLENGTHBYTES = 20;
 
 void Server::makeConnection() {
 #if defined(_WIN64)
+	*logger_ << "Making ServerWinTCP connection" << endl;
 	connection_ = make_unique<ServerWinTCP>();
 #elif defined LINUX
+	*logger_ << "Making ServerLinuxTCP connection" << endl;
 	connection_ = make_unique<ServerLinuxTCP>();
 #endif
 
-	if (connection_->makeConnection() == 1)
+	connection_->setLogger(logger_);
+
+	if (connection_->makeConnection() == 1) {
+		*logger_ << "ERROR: connection fail" << endl;
 		throw Error("ERROR: connection fail");
+	}
+
+	*logger_ << "Connection making done" << endl;
 }
 
 void Server::setDataBase() {
-	containerHandler_ = make_unique<SQLdataBase>(startData);
+	containerHandler_ = make_unique<SQLdataBase>();
+
+	containerHandler_->setLogger(logger_);
 
 	if (isConnectedToSQLdataBase()) {
-		//cout << "Using SQL database" << endl;
-
+		*logger_ << "Using SQL database" << endl;
 	} else {
-		containerHandler_ = make_unique<DefaultHandler>
-		                    (startData.users_file,
-		                     startData.messages_file);
-
-		cout << "Using default database" << endl;
+		*logger_ << "ERROR: cant connect to SQL database" << endl;
+		throw Error("ERROR: cant connect to SQL database");
 	}
 
 	readUsersFromDataBase();
@@ -53,35 +60,29 @@ void Server::readMessagesFromDataBase() {
 }
 
 void Server::displayMenu() {
+	*logger_ << "Server displayLoginMenu" << endl;
 
-	string menu = output.getLoginMenu();
+	string menu = output_.getLoginMenu();
 	size_t selection {};
 
 	while(true) {
 		try {
 			cout << menu;
 
-			selection = input.getInputSelection();
+			selection = input_.getInputSelection();
 
-			switch (selection) {
-				case 1:
-					displayLoginMenu();
-					break;
-
-				case 2:
-					displaySignupMenu();
-					break;
-
-				case 3:
-					throw Exit();
-
-				default:
-					throw Error("ERROR: input error");
+			if (selection == 1) {
+				displayLoginMenu();
+			} else if (selection == 2) {
+				displaySignupMenu();
+			} else if (selection == 3) {
+				throw Exit();
+			} else {
+				throw Error("ERROR: input_ error");
 			}
 
 			if (successfulAccessToAccount_)
 				break;
-
 		} catch (const Error& e) {
 			cout << e.what() << endl;
 		}
@@ -89,18 +90,21 @@ void Server::displayMenu() {
 }
 
 void Server::displayLoginMenu() {
-	string login = input.getInputString("login");
+	*logger_ << "Server displayLoginMenu" << endl;
+
+	string login = input_.getInputString("login");
 
 	auto user = findUser(login);
 
-	string password = input.getInputString("password");
+	string password = input_.getInputString("password");
 
 	uint* hash = user->second.sha1(password.c_str(), password.length());
 
 	uint* password_sha1_hash_ = user->second.getPasswordHash();
 
-	if (memcmp(hash, password_sha1_hash_, SHA1HASHLENGTHBYTES) != 0)
+	if (memcmp(hash, password_sha1_hash_, SHA1HASHLENGTHBYTES) != 0) {
 		throw Error("ERROR: wrong password");
+	}
 
 	setServerName(login);
 
@@ -110,15 +114,16 @@ void Server::displayLoginMenu() {
 }
 
 void Server::displaySignupMenuForClient() {
+	*logger_ << "Server displaySignupMenuForClient" << endl;
 	string login, password;
 
 	while(true) {
 		sendMessage("Enter login:\n");
 		login = reciveMessage();
 
-		if (isUserExists(login))
+		if (isUserExists(login)) {
 			sendMessage("ERROR: login already in use\n");
-		else {
+		} else {
 			sendMessage("Enter password:\n");
 			password = reciveMessage();
 
@@ -128,13 +133,13 @@ void Server::displaySignupMenuForClient() {
 			                                password.length())));
 
 			setUserName(login);
-
 			break;
 		}
 	}
 }
 
 void Server::displayLoginMenuForClient() {
+	*logger_ << "Server displayLoginMenuForClient" << endl;
 	string login;
 
 	while(true) {
@@ -162,6 +167,8 @@ void Server::displayLoginMenuForClient() {
 
 bool Server::isCorrectPassword(const string& password,
                                const string& login) {
+	*logger_ << "Server isCorrectPassword" << endl;
+
 	auto user = findUser(login);
 
 	uint* hash;
@@ -176,13 +183,15 @@ bool Server::isCorrectPassword(const string& password,
 	delete[] hash;
 	return false;
 }
-//
+
 void Server::displaySignupMenu() {
-	string login = input.getInputString("login");
+	*logger_ << "Server displaySignupMenu" << endl;
+
+	string login = input_.getInputString("login");
 	if (isUserExists(login))
 		throw Error("ERROR: login already in use");
 
-	string password = input.getInputString("password");
+	string password = input_.getInputString("password");
 
 	writeUserInDataBase(login, password);
 
@@ -200,10 +209,12 @@ void Server::startChat() {
 }
 
 void Server::displayMenuForClient() {
+	*logger_ << "Server displayMenuForClient" << endl;
+
 	string messageIn;
 	size_t selection;
 
-	string menu = output.getLoginMenu();
+	string menu = output_.getLoginMenu();
 
 	while (true) {
 		sendMessage(menu);
@@ -211,27 +222,23 @@ void Server::displayMenuForClient() {
 		messageIn = reciveMessage();
 		selection = messageIn[0];
 
-		switch (selection) {
-			case '1':
-				displayLoginMenuForClient();
-				return;
-
-			case '2':
-				displaySignupMenuForClient();
-				return;
-
-			case '3':
-				sendMessage("end");
-				throw Exit();
-
-			default:
-				sendMessage("ERROR: input error");
-				break;
+		if (selection == '1') {
+			displayLoginMenuForClient();
+			return;
+		} else if (selection == '2') {
+			displaySignupMenuForClient();
+			return;
+		} else if (selection == '3') {
+			sendMessage("end");
+			throw Exit();
+		} else {
+			sendMessage("ERROR: input error");
 		}
 	}
 }
 
 bool Server::displayChat() {
+	*logger_ << "Server displayChat" << endl;
 	displayUsersAndMessages();
 
 	string messageIn, messageOut, message;

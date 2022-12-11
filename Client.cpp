@@ -11,9 +11,9 @@ constexpr size_t SHA1HASHLENGTHBYTES = 20;
 
 void Client::makeConnection() {
 #if defined(_WIN64)
-	connection_ = make_unique<ClientWinTCP>(startData.ip_adr);
+	connection_ = make_unique<ClientWinTCP>(startData_.ip_adr);
 #elif defined LINUX
-	connection_ = make_unique<ClientLinuxTCP>(startData.ip_adr);
+	connection_ = make_unique<ClientLinuxTCP>(startData_.ip_adr);
 #endif
 
 	if (connection_->makeConnection() == 1)
@@ -21,11 +21,9 @@ void Client::makeConnection() {
 }
 
 void Client::displayMenu() {
-
 }
 
 void Client::setDataBase() {
-
 }
 
 void Client::startChat() {

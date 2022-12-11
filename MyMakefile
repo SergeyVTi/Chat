@@ -1,0 +1,49 @@
+CPP = g++
+SRC = main.cpp
+TARGET = chat.out
+MYLIB = ChatLib
+PREF = /usr/local/bin
+OBJ1 = AuthData.cpp Chat.cpp Message.cpp Connection.cpp Server.cpp Client.cpp 
+OBJ2 = Logger.cpp 
+OBJ3 = SQLdataBase.cpp
+LIBS = mysqlclient
+#-static-libgcc  "/lib/libmariadb.dll.a"
+INCS = "/usr/include/mysql"
+FLAGS = -std=c++17 
+# -Wall -Wextra -Wpedantic -g3 
+$(TARGET): 
+	$(CPP) -o $(TARGET) $(SRC) $(OBJ1) $(OBJ2) $(OBJ3) $(FLAGS) -I$(INCS) -l$(LIBS) 
+# -L. -l$(MYLIB) $(OBJ1) $(OBJ2) lib clean
+AuthData.o: AuthData.cpp
+	$(CPP) -c AuthData.cpp -o AuthData.o $(FLAGS) -I$(INCS)
+	
+Chat.o: Chat.cpp
+	$(CPP) -c Chat.cpp -o Chat.o $(FLAGS) -I$(INCS)
+	
+Message.o: Message.cpp
+	$(CPP) -c Message.cpp -o Message.o $(FLAGS) -I$(INCS)
+
+Connection.o: Connection.cpp
+	$(CPP) -c Connection.cpp -o Connection.o $(FLAGS) -I$(INCS)
+	
+Server.o: Server.cpp
+	$(CPP) -c Server.cpp -o Server.o $(FLAGS) -I$(INCS)
+	
+Client.o: Client.cpp
+	$(CPP) -c Client.cpp -o Client.o $(FLAGS) -I$(INCS)
+
+Logger.o: Logger.cpp
+	$(CPP) -c Logger.cpp -o Logger.o  $(FLAGS) -I$(INCS)
+	
+lib : $(OBJ1) $(OBJ2)   	
+	ar rc lib$(MYLIB).a $(OBJ1) $(OBJ2) 
+	export LD_LIBRARY_PATH=.	
+				
+clean : 
+	rm -rf *.o 
+
+install :
+	sudo install -v $(TARGET) $(PREF)
+
+uninstall :
+	sudo rm -rfv $(PREF)/$(TARGET)

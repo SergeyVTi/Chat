@@ -1,4 +1,3 @@
-
 #include "Chat.h"
 #include "Client.h"
 #include "Server.h"
@@ -8,7 +7,6 @@
 using namespace std;
 
 unique_ptr<Chat> selectChatMode();
-StartData startData;
 
 int main() {
 	setlocale(LC_ALL, "");
@@ -37,32 +35,27 @@ int main() {
 
 
 unique_ptr<Chat> selectChatMode() {
-	Input input;
-	Output output;
+	Input input_;
+	Output output_;
 	size_t selection {};
 
 	while(true) {
 		try {
-			cout << output.getSelectModeMenu();
+			cout << output_.getSelectModeMenu();
 
-			selection = input.getInputSelection();
+			selection = input_.getInputSelection();
 
-			switch (selection) {
-				case 1:
-					return make_unique<Server>(startData);
-
-				case 2:
+			if (selection == 1)
+				return make_unique<Server>();
+			else if (selection == 2)
 //					if (ip_adr.size() == 0)
-//						ip_adr = input.getInputString("server ip adress");
+//						ip_adr = input_.getInputString("server ip adress");
+				return make_unique<Client>();
+			else if (selection == 3)
+				throw Exit();
+			else
+				throw Error("ERROR: input error");
 
-					return make_unique<Client>(startData);
-
-				case 3:
-					throw Exit();
-
-				default:
-					throw Error("ERROR: input error");
-			}
 		} catch (const Error& e) {
 			cout << e.what() << endl;
 		}

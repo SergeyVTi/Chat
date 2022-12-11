@@ -38,9 +38,14 @@
 *.vs
 x64/
 .vscode/
-build/
+
+# CMake
+CMakeFiles/
+*.cmake
 
 *.win
 *.dev
 *.layout
 *.md
+
+log.txt

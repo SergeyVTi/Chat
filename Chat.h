@@ -1,34 +1,23 @@
 #pragma once
 
 #include "Connection.h"
-#include "DataBase.h"
+#include "SQLdataBase.h"
 #include "InOut.h"
-//#include "OS_info.h"
-//#include "Errors.h"
+#include "Logger.h"
+#include "StartData.h"
 
 #include <string>
 #include <unordered_map>
 #include <iostream>
-#include <filesystem>
-#include <memory>
+//#include <filesystem>
+//#include <memory>
 
-namespace fs = std::filesystem;//
-
-struct StartData {
-	const  char* SQL_name = "testdb";
-	const  char* SQL_user = "root";
-	const  char* SQL_password = "root";
-	const  std::string SQL_commands = "createTables.txt";
-
-	const  std::string users_file = "users.txt";
-	const  std::string messages_file = "messages.txt";
-	std::string ip_adr = "127.0.0.1";
-};
+//namespace fs = std::filesystem;//
 
 class Chat {
 	public:
-		Chat(const StartData& data) : startData(data) {
-		}
+		Chat() = default; //const StartData& data startData_(data) 
+		
 		virtual ~Chat() = default;
 
 		virtual void displayMenu() = 0;
@@ -39,7 +28,7 @@ class Chat {
 	protected:
 
 		void writeUserInDataBase(const std::string& login,
-		                     const std::string& password);
+		                         const std::string& password);
 		void writeMessageInDataBase(const Message& message);
 		std::unordered_map<std::string, AuthData>::iterator findUser(
 		    const std::string& login);
@@ -57,10 +46,10 @@ class Chat {
 	protected:
 		bool successfulAccessToAccount_ = 0;
 		std::unique_ptr<Connection> connection_ = nullptr;
-		std::unique_ptr<DataBase> containerHandler_ = nullptr;
-		Input input;
-		Output output;
-		StartData startData;
+		std::unique_ptr<SQLdataBase> containerHandler_ = nullptr;
+		Input input_;
+		Output output_;
+		StartData startData_;
 };
 
 
