@@ -42,6 +42,7 @@ x64/
 # CMake
 CMakeFiles/
 *.cmake
+CMakeCache.txt
 
 *.win
 *.dev
@@ -49,3 +50,4 @@ CMakeFiles/
 *.md
 
 log.txt
+
